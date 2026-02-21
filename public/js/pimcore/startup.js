@@ -24,30 +24,73 @@ document.addEventListener(pimcore.events.postOpenAsset, (e) => {
                         text: 'Freistellen',
                         itemId: 'watza_autocutout_btn',
                         handler: () => {
-                            console.log(`[WatzaAutoCutout] Button gedrückt für Asset-ID: ${asset.id}`);
 
-                            Ext.Ajax.request({
-                                url: '/admin/watza/autocutout/remake',
-                                method: 'POST',
-                                params: {
-                                    id: asset.id,
-                                    fuzz: 0.15
-                                },
-                                success: (response) => {
-                                    const data = Ext.decode(response.responseText);
-                                    if (data.success) {
-                                        console.log(`[WatzaAutoCutout] Freistellen erfolgreich gestartet für Asset-ID ${asset.id}`);
-                                        Ext.Msg.alert('Erfolg', 'Bild wird erneut freigestellt.');
-                                    } else {
-                                        console.warn(`[WatzaAutoCutout] Fehler: ${data.message}`);
-                                        Ext.Msg.alert('Fehler', data.message);
+                            const previewImage = Ext.create('Ext.Img', {
+                                style: 'max-width:100%;max-height:400px;',
+                            });
+
+                            const slider = Ext.create('Ext.slider.Single', {
+                                width: 300,
+                                minValue: 0,
+                                maxValue: 50,
+                                value: 15,
+                                increment: 1,
+                                fieldLabel: 'Fuzz (%)',
+                                listeners: {
+                                    change: function (s, value) {
+                                        loadPreview(value / 100);
                                     }
-                                },
-                                failure: (response) => {
-                                    console.error(`[WatzaAutoCutout] AJAX Fehler für Asset-ID ${asset.id}:`, response);
-                                    Ext.Msg.alert('Fehler', 'Server konnte nicht erreicht werden.');
                                 }
                             });
+
+                            const loadPreview = (fuzz) => {
+                                Ext.Ajax.request({
+                                    url: '/admin/watza/autocutout/preview',
+                                    method: 'POST',
+                                    params: {
+                                        id: asset.id,
+                                        fuzz: fuzz
+                                    },
+                                    success: (response) => {
+                                        const data = Ext.decode(response.responseText);
+                                        if (data.success) {
+                                            previewImage.setSrc(data.image);
+                                        }
+                                    }
+                                });
+                            };
+
+                            const win = Ext.create('Ext.window.Window', {
+                                title: 'Freistellen Preview',
+                                width: 600,
+                                height: 600,
+                                layout: 'vbox',
+                                items: [
+                                    slider,
+                                    previewImage
+                                ],
+                                buttons: [{
+                                    text: 'Final speichern',
+                                    handler: () => {
+                                        Ext.Ajax.request({
+                                            url: '/admin/watza/autocutout/remake',
+                                            method: 'POST',
+                                            params: {
+                                                id: asset.id,
+                                                fuzz: slider.getValue() / 100
+                                            },
+                                            success: () => {
+                                                Ext.Msg.alert('Erfolg', 'Bild wird freigestellt.');
+                                                win.close();
+                                            }
+                                        });
+                                    }
+                                }]
+                            });
+
+                            win.show();
+
+                            loadPreview(0.15);
                         }
                     });
                     console.log(`[WatzaAutoCutout] Button erfolgreich hinzugefügt!`);

@@ -81,4 +81,41 @@ class AwardCutoutService
         $new->setData($imagick->getImageBlob());
         $new->save();
     }
+
+    public function generatePreview(Image $asset, float $fuzz): string
+    {
+        $imagick = new \Imagick();
+        $imagick->readImageBlob($asset->getData());
+        $imagick->setImageColorspace(\Imagick::COLORSPACE_RGB);
+        $imagick->setImageAlphaChannel(\Imagick::ALPHACHANNEL_SET);
+
+        $fuzz = $fuzz * \Imagick::getQuantum();
+
+        $pixel = $imagick->getImagePixelColor(0, 0);
+        $bgColor = $pixel->getColor();
+
+        $width = $imagick->getImageWidth();
+        $height = $imagick->getImageHeight();
+
+        foreach ([
+                     ['x' => 0, 'y' => 0],
+                     ['x' => $width-1, 'y' => 0],
+                     ['x' => 0, 'y' => $height-1],
+                     ['x' => $width-1, 'y' => $height-1]
+                 ] as $point) {
+            $imagick->floodFillPaintImage(
+                new \ImagickPixel("transparent"),
+                $fuzz,
+                new \ImagickPixel("rgb({$bgColor['r']},{$bgColor['g']},{$bgColor['b']})"),
+                $point['x'],
+                $point['y'],
+                false
+            );
+        }
+
+        $imagick->trimImage(0);
+        $imagick->setImageFormat('png');
+
+        return base64_encode($imagick->getImageBlob());
+    }
 }

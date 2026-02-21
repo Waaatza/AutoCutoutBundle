@@ -5,3 +5,7 @@ watza_auto_cutout_homepage:
 watza_autocutout_remake:
     path: /admin/watza/autocutout/remake
     controller: Watza\AutoCutoutBundle\Controller\AdminController::remakeAction
+
+watza_autocutout_preview:
+    path: /admin/watza/autocutout/preview
+    controller: Watza\AutoCutoutBundle\Controller\AdminController::previewAction
