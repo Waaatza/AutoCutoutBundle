@@ -21,9 +21,34 @@ document.addEventListener(pimcore.events.postOpenAsset, (e) => {
                 if (!tb.down('#watza_autocutout_btn')) {
                     tb.add({
                         xtype: 'button',
-                        text: 'Erneut freistellen',
+                        text: 'Freistellen',
                         itemId: 'watza_autocutout_btn',
-                        handler: () => console.log(`[WatzaAutoCutout] Button gedrückt für Asset-ID: ${asset.id}`)
+                        handler: () => {
+                            console.log(`[WatzaAutoCutout] Button gedrückt für Asset-ID: ${asset.id}`);
+
+                            Ext.Ajax.request({
+                                url: '/admin/watza/autocutout/remake',
+                                method: 'POST',
+                                params: {
+                                    id: asset.id,
+                                    fuzz: 0.15
+                                },
+                                success: (response) => {
+                                    const data = Ext.decode(response.responseText);
+                                    if (data.success) {
+                                        console.log(`[WatzaAutoCutout] Freistellen erfolgreich gestartet für Asset-ID ${asset.id}`);
+                                        Ext.Msg.alert('Erfolg', 'Bild wird erneut freigestellt.');
+                                    } else {
+                                        console.warn(`[WatzaAutoCutout] Fehler: ${data.message}`);
+                                        Ext.Msg.alert('Fehler', data.message);
+                                    }
+                                },
+                                failure: (response) => {
+                                    console.error(`[WatzaAutoCutout] AJAX Fehler für Asset-ID ${asset.id}:`, response);
+                                    Ext.Msg.alert('Fehler', 'Server konnte nicht erreicht werden.');
+                                }
+                            });
+                        }
                     });
                     console.log(`[WatzaAutoCutout] Button erfolgreich hinzugefügt!`);
                 } else {

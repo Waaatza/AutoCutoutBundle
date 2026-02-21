@@ -1,3 +1,7 @@
 watza_auto_cutout_homepage:
     path:     /watza_auto_cutout
     defaults: { _controller: Watza\AutoCutoutBundle\Controller\DefaultController::indexAction }
+
+watza_autocutout_remake:
+    path: /admin/watza/autocutout/remake
+    controller: Watza\AutoCutoutBundle\Controller\AdminController::remakeAction

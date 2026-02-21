@@ -8,24 +8,42 @@ use Pimcore\Model\Asset\Folder;
 
 class AwardCutoutService
 {
+    private float $defaultFuzz = 0.15;
+
+    public function __construct(float $defaultFuzz = 0.15)
+    {
+        $this->defaultFuzz = $defaultFuzz;
+    }
+
     public function removeBackground(Image $asset): void
     {
         if (str_contains($asset->getFullPath(), '/_freigestellt/')) {
             return;
         }
 
+        // Fuzz aus Custom Property oder Standardwert
+        // Property abrufen
+        $prop = $asset->getProperty('cutout_fuzz', 'watza_autocutout');
+
+        if ($prop instanceof \Pimcore\Model\Property) {
+            $fuzz = $prop->getData();
+        } else {
+            // direkter Wert oder null
+            $fuzz = $prop;
+        }
+
+        $fuzz = $fuzz ?? $this->defaultFuzz;
+        $fuzz = (float)$fuzz;
+
+        $fuzz = $fuzz * \Imagick::getQuantum();
         $imagick = new \Imagick();
         $imagick->readImageBlob($asset->getData());
         $imagick->setImageColorspace(\Imagick::COLORSPACE_RGB);
         $imagick->setImageAlphaChannel(\Imagick::ALPHACHANNEL_SET);
 
-        // Hintergrundfarbe vom Rand (oben links)
         $pixel = $imagick->getImagePixelColor(0, 0);
-        $bgColor = $pixel->getColor(); // ['r'=>..., 'g'=>..., 'b'=>...]
+        $bgColor = $pixel->getColor();
 
-        // ------------------------------
-        // 1️⃣ FloodFill von allen Ecken
-        // ------------------------------
         $width = $imagick->getImageWidth();
         $height = $imagick->getImageHeight();
 
@@ -37,7 +55,7 @@ class AwardCutoutService
                  ] as $point) {
             $imagick->floodFillPaintImage(
                 new \ImagickPixel("transparent"),
-                0, // fuzz = 0, optional später anpassen
+                $fuzz,
                 new \ImagickPixel("rgb({$bgColor['r']},{$bgColor['g']},{$bgColor['b']})"),
                 $point['x'],
                 $point['y'],
@@ -45,15 +63,9 @@ class AwardCutoutService
             );
         }
 
-        // ------------------------------
-        // 2️⃣ Trimmen nur der Ränder
-        // ------------------------------
         $imagick->trimImage(0);
         $imagick->setImageFormat('png');
 
-        // ------------------------------
-        // 3️⃣ Zielordner
-        // ------------------------------
         $targetFolderPath = '/Awards/_freigestellt';
         $targetFolder = Asset::getByPath($targetFolderPath);
         if (!$targetFolder instanceof Folder) {
@@ -63,9 +75,6 @@ class AwardCutoutService
             $targetFolder->save();
         }
 
-        // ------------------------------
-        // 4️⃣ Neues Asset speichern
-        // ------------------------------
         $new = new Image();
         $new->setParent($targetFolder);
         $new->setFilename(pathinfo($asset->getFilename(), PATHINFO_FILENAME) . '_freigestellt.png');
