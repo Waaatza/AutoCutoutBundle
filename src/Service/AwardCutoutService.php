@@ -75,9 +75,26 @@ class AwardCutoutService
             $targetFolder->save();
         }
 
+        $baseName = pathinfo($asset->getFilename(), PATHINFO_FILENAME);
+        $ext = 'png';
+        $newName = $baseName . '_freigestellt.' . $ext;
+        $counter = 1;
+
+        $children = $targetFolder->getChildren();
+
+        $existingNames = [];
+        foreach ($children as $child) {
+            $existingNames[] = $child->getFilename();
+        }
+
+        while (in_array($newName, $existingNames)) {
+            $newName = $baseName . '_freigestellt_' . $counter . '.' . $ext;
+            $counter++;
+        }
+
         $new = new Image();
         $new->setParent($targetFolder);
-        $new->setFilename(pathinfo($asset->getFilename(), PATHINFO_FILENAME) . '_freigestellt.png');
+        $new->setFilename($newName);
         $new->setData($imagick->getImageBlob());
         $new->save();
 
