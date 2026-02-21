@@ -25,9 +25,21 @@ document.addEventListener(pimcore.events.postOpenAsset, (e) => {
                         itemId: 'watza_autocutout_btn',
                         handler: () => {
 
+                            const previewImage = Ext.create('Ext.Component', {
+                                itemId: 'previewImage',
+                                autoEl: {
+                                    tag: 'img',
+                                    style: `
+                                        width: 100%;
+                                        height: 100%;
+                                        object-fit: contain;
+                                        display: block;
+                                    `
+                                }
+                            });
+
                             const previewContainer = Ext.create('Ext.Container', {
-                                width: '100%',
-                                height: 400,
+                                flex: 1,
                                 layout: 'fit',
                                 style: `
                                     background-color: #eee;
@@ -39,15 +51,36 @@ document.addEventListener(pimcore.events.postOpenAsset, (e) => {
                                     background-size: 20px 20px;
                                     background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
                                     `,
-                                items: [{
-                                    xtype: 'image',
-                                    itemId: 'previewImage',
-                                    style: 'max-width:100%;max-height:400px;margin:auto;'
-                                }]
+                                items: [previewImage]
                             });
 
+                            const loadPreview = Ext.Function.createBuffered(function (fuzz) {
+
+                                previewContainer.setLoading(true);
+
+                                Ext.Ajax.request({
+                                    url: '/admin/watza/autocutout/preview',
+                                    method: 'POST',
+                                    params: {
+                                        id: asset.id,
+                                        fuzz: fuzz
+                                    },
+                                    success: (response) => {
+                                        const data = Ext.decode(response.responseText);
+                                        if (data.success && data.image) {
+                                            previewImage.getEl().dom.src = data.image;
+                                        }
+                                        previewContainer.setLoading(false);
+                                    },
+                                    failure: () => {
+                                        previewContainer.setLoading(false);
+                                    }
+                                });
+
+                            }, 300);
+
                             const slider = Ext.create('Ext.slider.Single', {
-                                width: 300,
+                                width: '100%',
                                 minValue: 0,
                                 maxValue: 50,
                                 value: 15,
@@ -60,30 +93,21 @@ document.addEventListener(pimcore.events.postOpenAsset, (e) => {
                                 }
                             });
 
-                            const loadPreview = (fuzz) => {
-                                Ext.Ajax.request({
-                                    url: '/admin/watza/autocutout/preview',
-                                    method: 'POST',
-                                    params: {
-                                        id: asset.id,
-                                        fuzz: fuzz
-                                    },
-                                    success: (response) => {
-                                        const data = Ext.decode(response.responseText);
-                                        if (data.success) {
-                                            previewContainer.down('#previewImage').setSrc(data.image);
-                                        }
-                                    }
-                                });
-                            };
-
                             const win = Ext.create('Ext.window.Window', {
                                 title: 'Freistellen Preview',
-                                width: 600,
-                                height: 600,
-                                layout: 'vbox',
+                                width: 720,
+                                height: 680,
+                                layout: {
+                                    type: 'vbox',
+                                    align: 'stretch'
+                                },
+                                bodyPadding: 20,
                                 items: [
                                     slider,
+                                    {
+                                        xtype: 'component',
+                                        height: 15
+                                    },
                                     previewContainer
                                 ],
                                 buttons: [{
@@ -99,6 +123,9 @@ document.addEventListener(pimcore.events.postOpenAsset, (e) => {
                                             success: () => {
                                                 Ext.Msg.alert('Erfolg', 'Bild wird freigestellt.');
                                                 win.close();
+                                            },
+                                            failure: () => {
+                                                Ext.Msg.alert('Fehler', 'Speichern fehlgeschlagen.');
                                             }
                                         });
                                     }
