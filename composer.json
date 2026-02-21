@@ -1,0 +1,27 @@
+{
+  "name": "watza/autocutoutbundle",
+  "description": "Automatic image background removal for Pimcore assets in the Awards folder",
+  "type": "pimcore-bundle",
+  "license": "GPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "Henri Faust"
+    }
+  ],
+  "require": {
+    "php": "^8.1",
+    "pimcore/pimcore": "^11.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Watza\\AutoCutoutBundle\\": "src/"
+    }
+  },
+  "extra": {
+    "pimcore-bundle": {
+      "bundle-class": "Watza\\AutoCutoutBundle\\WatzaAutoCutoutBundle"
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
