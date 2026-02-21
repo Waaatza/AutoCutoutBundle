@@ -2,8 +2,9 @@
 
 **Work-In-Progress**
 
-The Watza AutoCutoutBundle provides automatic image single-colored background removal for assets in the `/Awards` folder.  
+The Watza AutoCutoutBundle provides automatic image single-colored-background removal for assets located in a `/Awards` folder.  
 The bundle adds a button to the Pimcore asset toolbar to remove the background of an image and save the result in a `_freigestellt` subfolder.
+The first removal is done automatically by an EventListener.
 
 ---
 
