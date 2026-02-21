@@ -15,7 +15,7 @@ class AwardCutoutService
         $this->defaultFuzz = $defaultFuzz;
     }
 
-    public function removeBackground(Image $asset): void
+    public function removeBackground(Image $asset)
     {
         if (str_contains($asset->getFullPath(), '/_freigestellt/')) {
             return;
@@ -80,6 +80,8 @@ class AwardCutoutService
         $new->setFilename(pathinfo($asset->getFilename(), PATHINFO_FILENAME) . '_freigestellt.png');
         $new->setData($imagick->getImageBlob());
         $new->save();
+
+        return $new;
     }
 
     public function generatePreview(Image $asset, float $fuzz): string

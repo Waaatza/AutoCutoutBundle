@@ -13,8 +13,7 @@ use Watza\AutoCutoutBundle\Service\AwardCutoutService;
 class AdminController extends AbstractController
 {
     #[Route('/admin/watza/autocutout/remake', name: 'watza_autocutout_remake', methods: ['POST'])]
-    public function remakeAction
-    (Request $request, AwardCutoutService $service): JsonResponse
+    public function remakeAction(Request $request, AwardCutoutService $service): JsonResponse
     {
         $id = $request->get('id');
         $fuzz = (float)$request->get('fuzz', 0.15);
@@ -28,9 +27,16 @@ class AdminController extends AbstractController
         $asset->setProperty('cutout_fuzz', $fuzz, 'watza_autocutout');
         $asset->save();
 
-        $service->removeBackground($asset);
+        $newAsset = $service->removeBackground($asset);
 
-        return $this->json(['success' => true]);
+        if ($newAsset instanceof Image) {
+            return $this->json([
+                'success' => true,
+                'newAssetId' => $newAsset->getId()
+            ]);
+        }
+
+        return $this->json(['success' => false, 'message' => 'Freistellung fehlgeschlagen']);
     }
 
     #[Route('/admin/watza/autocutout/preview', name: 'watza_autocutout_preview', methods: ['POST'])]
