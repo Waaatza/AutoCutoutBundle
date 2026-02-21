@@ -8,6 +8,20 @@ The first removal is done automatically by an EventListener.
 
 ---
 
+## Installation
+
+1. Copy to your `/bundles` directory:
+2. Enable the bundle in `bundles.php` by adding:
+
+```php
+Watza\AutoCutoutBundle\AutoCutoutBundle::class => ['all' => true],
+```
+
+### Requirements
+- Pimcore Version 11.x (compatible with versions ≥11. Untested with Pimcore 12)
+
+---
+
 ## Features
 
 - **Toolbar Integration:** Adds a **“Freistellen”** button in the Pimcore Asset Detail view for images located in `/Awards`.
@@ -28,9 +42,13 @@ The first removal is done automatically by an EventListener.
 4. Click **Final speichern** to save the image with a transparent background.  
    The new image is stored in the `_freigestellt` subfolder, and a short notification confirms success.
 
+
+![Example Image](./public/images/demo-image.jpg)
+
 ---
 
 ## Notes
 
+- UI currently **only in German**.
 - Works **only on image assets**.
-- The bundle is still a **work in progress** and may be extended with additional options in the future. Use at your own risk!
+- The bundle is still a **work in progress** and may or may not be extended with additional options in the future. Use at your own risk!
