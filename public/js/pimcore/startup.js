@@ -121,8 +121,12 @@ document.addEventListener(pimcore.events.postOpenAsset, (e) => {
                                                 fuzz: slider.getValue() / 100
                                             },
                                             success: () => {
-                                                Ext.Msg.alert('Erfolg', 'Bild wird freigestellt.');
                                                 win.close();
+                                                pimcore.helpers.showNotification(
+                                                    'Erfolg',
+                                                    'Bild wurde freigestellt!',
+                                                    'success',
+                                                    4000 );
                                             },
                                             failure: () => {
                                                 Ext.Msg.alert('Fehler', 'Speichern fehlgeschlagen.');

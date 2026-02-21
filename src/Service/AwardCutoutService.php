@@ -22,7 +22,6 @@ class AwardCutoutService
         }
 
         // Fuzz aus Custom Property oder Standardwert
-        // Property abrufen
         $prop = $asset->getProperty('cutout_fuzz', 'watza_autocutout');
 
         if ($prop instanceof \Pimcore\Model\Property) {
