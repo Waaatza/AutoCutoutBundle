@@ -25,8 +25,25 @@ document.addEventListener(pimcore.events.postOpenAsset, (e) => {
                         itemId: 'watza_autocutout_btn',
                         handler: () => {
 
-                            const previewImage = Ext.create('Ext.Img', {
-                                style: 'max-width:100%;max-height:400px;',
+                            const previewContainer = Ext.create('Ext.Container', {
+                                width: '100%',
+                                height: 400,
+                                layout: 'fit',
+                                style: `
+                                    background-color: #eee;
+                                    background-image:
+                                        linear-gradient(45deg, #ccc 25%, transparent 25%),
+                                        linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                                        linear-gradient(45deg, transparent 75%, #ccc 75%),
+                                        linear-gradient(-45deg, transparent 75%, #ccc 75%);
+                                    background-size: 20px 20px;
+                                    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+                                    `,
+                                items: [{
+                                    xtype: 'image',
+                                    itemId: 'previewImage',
+                                    style: 'max-width:100%;max-height:400px;margin:auto;'
+                                }]
                             });
 
                             const slider = Ext.create('Ext.slider.Single', {
@@ -54,7 +71,7 @@ document.addEventListener(pimcore.events.postOpenAsset, (e) => {
                                     success: (response) => {
                                         const data = Ext.decode(response.responseText);
                                         if (data.success) {
-                                            previewImage.setSrc(data.image);
+                                            previewContainer.down('#previewImage').setSrc(data.image);
                                         }
                                     }
                                 });
@@ -67,7 +84,7 @@ document.addEventListener(pimcore.events.postOpenAsset, (e) => {
                                 layout: 'vbox',
                                 items: [
                                     slider,
-                                    previewImage
+                                    previewContainer
                                 ],
                                 buttons: [{
                                     text: 'Final speichern',
