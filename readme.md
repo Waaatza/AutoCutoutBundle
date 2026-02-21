@@ -2,17 +2,34 @@
 
 **Work-In-Progress**
 
-A Pimcore 11 bundle that provides automatic image background removal for assets in the `Awards` folder.  
-The bundle adds a button to the Pimcore asset toolbar, which removes the background of an image and saves the result in a `_freigestellt` subfolder.
+A Pimcore 11 bundle that provides automatic image background removal for assets in the `/Awards` folder.  
+The bundle adds a button to the Pimcore asset toolbar to remove the background of an image and save the result in a `_freigestellt` subfolder.
 
 ---
 
-## "Features"
+## Features
 
-- Toolbar button in the Pimcore Asset Detail view:
-    - **Save & Publish** → keeps the standard Pimcore save functionality
-    - **AutoCutout** → triggers automatic background removal
-- Stores a **custom property `cutout_fuzz`** to control the tolerance for background removal
-- Automatically creates the `_freigestellt` target folder under `/Awards` if it doesn't exist
-- Uses a flood-fill algorithm on the four corners of the image to safely remove the background
-- Output is a PNG with transparent background
+- **Toolbar Integration:** Adds a **“Freistellen”** button in the Pimcore Asset Detail view for images located in `/Awards`.
+- **Custom Property:** Stores a `cutout_fuzz` property on the original asset to control background removal tolerance.
+- **Automatic Folder Creation:** Creates the `_freigestellt` target folder under `/Awards` if it doesn't already exist.
+- **Background Removal Algorithm:** Uses a flood-fill method on the four corners of the image to safely remove the background.
+- **Output Format:** Generates a PNG with a transparent background.
+- **Preview & Fuzz Control:** Provides a live preview with a slider to adjust fuzziness before finalizing the image.
+- **Notifications:** Shows a short success notification in Pimcore after the background removal completes.
+
+---
+
+## Usage
+
+1. Open an image asset in the `/Awards` folder.
+2. Click the **Freistellen** button in the asset toolbar.
+3. Adjust the **Fuzz (%)** slider in the preview window to fine-tune background removal.
+4. Click **Final speichern** to save the image with a transparent background.  
+   The new image is stored in the `_freigestellt` subfolder, and a short notification confirms success.
+
+---
+
+## Notes
+
+- Works **only on image assets**.
+- The bundle is still a **work in progress** and may be extended with additional options in the future.
