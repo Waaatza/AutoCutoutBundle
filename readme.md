@@ -7,7 +7,7 @@ The bundle adds a button to the Pimcore asset toolbar, which removes the backgro
 
 ---
 
-## Features
+## "Features"
 
 - Toolbar button in the Pimcore Asset Detail view:
     - **Save & Publish** → keeps the standard Pimcore save functionality
