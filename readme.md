@@ -1,8 +1,8 @@
-# Watza AutoCutoutBundle
+# AutoCutoutBundle for Pimcore 11
 
 **Work-In-Progress**
 
-A Pimcore 11 bundle that provides automatic image background removal for assets in the `/Awards` folder.  
+The Watza AutoCutoutBundle provides automatic image background removal for assets in the `/Awards` folder.  
 The bundle adds a button to the Pimcore asset toolbar to remove the background of an image and save the result in a `_freigestellt` subfolder.
 
 ---
@@ -32,4 +32,4 @@ The bundle adds a button to the Pimcore asset toolbar to remove the background o
 ## Notes
 
 - Works **only on image assets**.
-- The bundle is still a **work in progress** and may be extended with additional options in the future.
+- The bundle is still a **work in progress** and may be extended with additional options in the future. Use at your own risk!
